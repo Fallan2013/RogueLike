@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace RogueLike
 {
@@ -11,17 +13,20 @@ namespace RogueLike
     {
         public int chDmg;
         public int chHp;
-        
-        public Character(int ChDmg, int ChHp )
+
+        public Character(int ChDmg, int ChHp)
         {
-            this.chDmg = ChDmg ;
-            this.chHp = ChHp ;
+            this.chDmg = ChDmg;
+            this.chHp = ChHp;
 
         }
 
         public void Print()
         {
-            Console.WriteLine($"Урон персонажа: {chDmg}\nЗдоровье: {chHp}"); 
+            Console.WriteLine($"Урон персонажа: {chDmg}\nЗдоровье: {chHp}");
         }
+
+
     }
+
 }

@@ -8,8 +8,9 @@
             //Menu startMenu = new ();
             Character Warior = new (1,10);
             Save save = new();
-
-
+            map.mapCreater(40, 40);
+            map.mapPrinter();
+            
         }
     }
 }
