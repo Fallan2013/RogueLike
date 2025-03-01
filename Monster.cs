@@ -8,5 +8,6 @@ namespace RogueLike
 {
     internal class Monster
     {
+        
     }
 }

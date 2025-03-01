@@ -8,18 +8,25 @@ using System.Xml.Linq;
 
 namespace RogueLike
 {
-    internal class Map
-    { private (int, int) housesize = (3, 3);
+    public class Map
+    {
+       public Map()
+        {
+            underfeet = floor;
+        }
+        private int awarness =5;
+        private (int, int) housesize = (3, 3);
         public (int, int) heroPosition = (18, 18);
         private static int mapX = 40;
         private static int mapY = 40;
-        Cage[,] map = new Cage[mapX,mapY];
-        Cage border = new Cage("#", true);
-        Cage floor = new Cage(".", false);
-        Cage hero = new Cage("h", false);
-        Cage monster = new Cage("m", false);
-        Cage door = new Cage("d", false);
-        Wall wall = new Wall("@", false, false);
+        public static Cage[,] map = new Cage[mapX,mapY];
+        Cage border = new Cage("#", false,false);
+        public static Cage floor = new Cage(".", true,false);
+        Cage hero = new Cage("h", true,true);
+        Cage monster = new Cage("m", false, false);
+        Cage door = new Cage("d", true, false);
+        Wall wall = new Wall("@", false, false, false);
+        public Cage underfeet ;
         public void mapCreater(int mapX, int mapY)
         {
             for (int Y = 0; Y < mapY; Y++)
@@ -36,10 +43,10 @@ namespace RogueLike
                     }
                 }
             }
-
             map[heroPosition.Item1, heroPosition.Item2] = hero;
             map[2, 2] = monster;
-            HouseCreator((10,10),(5,5));
+            HouseCreator((18,18),(5,5));
+           
         }
 
         public void HouseCreator((int,int) houseCenter,(int,int)houseSize)
@@ -75,95 +82,113 @@ namespace RogueLike
                     doorpos != (hx - h1, hy + h22) &
                     doorpos != (hx + h11, hy - h2) &
                     doorpos != (hx + h11, hy + h22) &
-                    doorpos != (hx,hy))
+                    doorpos != (hx,hy) & map[dx,dy]!=floor )
                 {
                     dexist = false;
                     map[doorpos.Item1, doorpos.Item2] = door;
                 }
             }
-
-
-
         }
-        public void mapPrinter()
-        { while (true)
+        public void mapPrinter(int mapX, int mapY)
+        {
+            Console.CursorVisible = false;
+            Console.Clear();
+            for (int Y = 0; Y < mapY; Y++)
             {
-               
-                Console.Clear();
-                for (int Y = 0; Y < mapY; Y++)
+                for (int X = 0; X < mapX; X++)
                 {
-                    for (int X = 0; X < mapX; X++)
+                    
+                    if ((X > heroPosition.Item1-awarness && Y > heroPosition.Item2-awarness)&&(X< heroPosition.Item1 + awarness&& Y < heroPosition.Item2 + awarness) )
                     {
+                        Console.ForegroundColor = ConsoleColor.White;
                         Console.Write(map[X, Y].symbol);
                     }
-                    Console.WriteLine();
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.Write(".");
+                    }
                 }
-                Move();
-               
-                Thread.Sleep(1000);
+                Console.WriteLine();
             }
-
-
+            Thread.Sleep(800);
         }
+
         
-        public (int, int) Move()
-        {
+
+        public void Move()
+        {   
             int x = heroPosition.Item1;
             int y = heroPosition.Item2;
-            int X =x;
-            int Y =y;
-            Console.SetCursorPosition(X, Y);
+
             ConsoleKeyInfo moveKey = Console.ReadKey();
-          
+
+            int newX = x;
+            int newY = y;
+
             switch (moveKey.Key)
             {
                 case ConsoleKey.UpArrow:
-                    Y--;
+                    newY--;
                     break;
                 case ConsoleKey.DownArrow:
-                    Y++;
+                    newY++;
                     break;
                 case ConsoleKey.LeftArrow:
-                    X--;
+                    newX--;
                     break;
                 case ConsoleKey.RightArrow:
-                    X++;
+                    newX++;
                     break;
             }
-            object underfeet = map[x,y];
-            object stepTo = map[X, Y];
-            if (map[X,Y].block == false)
+            object stepTo = map[newX, newY];
+            if (map[newX, newY].block == false)
             {
-               
-            }
-            else
-            {
-                heroPosition = (X, Y);
-                underfeet = stepTo;
-                map[X, Y] = hero;
+                
             }
 
+            //else
+            //{
+            //    map[x, y] = underfeet;
+            //    heroPosition = (newX, newY);
 
-            return (heroPosition);
+            //    map[newX, newY] = hero;
+            //    return (heroPosition);
+            //}
+            Cage targetCell = map[newX,newY];
+            if (newX < 0 || newX >= map.GetLength(0) || newY < 0 || newY >= map.GetLength(1))
+            {
+                return;
+            }
+            if (targetCell.block)
+            {
+                map[x, y] = underfeet;
+                heroPosition = (newX, newY);
+                underfeet = targetCell;
+                map[newX, newY] = hero;
+
+            }
         }
 
         public class Cage
         {
             
-            public string symbol { get; set; }
-            public bool block { get; set; }
-            public Cage(string CageSymbol, bool Block)
+            public string symbol   { get; set; }
+            public bool block      { get; set; }
+            public bool player     { get; set; }
+            public Cage(string CageSymbol, bool Block, bool Player)
             {
                 symbol = CageSymbol;
-                block = block;
+                block = Block;
+                player = Player;
             }
 
         }
         public class Wall : Cage
         {
             public bool visability { get; set; }
-            public Wall(string CageSymbol, bool Block, bool Vision)
-                :base(CageSymbol, Block)
+            public Wall(string CageSymbol, bool Block, bool Player , bool Vision)
+                :base(CageSymbol, Block, Player)
             {
                 visability = Vision;
             }
