@@ -13,7 +13,7 @@ namespace RogueLike
         public (int, int) heroPosition = (18, 18);
         private static int mapX = 40;
         private static int mapY = 40;
-        private string[,] map = new string[mapX, mapY];
+        Cage[,] map = new Cage[mapX,mapY];
         Cage border = new Cage("#", true);
         Cage floor = new Cage(".", false);
         Cage hero = new Cage("h", false);
@@ -28,17 +28,17 @@ namespace RogueLike
                 {
                     if (X == 0 || X == mapX - 1 || (Y == 0 || Y == mapY - 1))
                     {
-                        map[X, Y] = border.symbol;
+                        map[X, Y] = border;
                     }
                     else
                     {
-                        map[X, Y] = floor.symbol;
+                        map[X, Y] = floor;
                     }
                 }
             }
 
-            map[heroPosition.Item1, heroPosition.Item2] = hero.symbol;
-            map[2, 2] = monster.symbol;
+            map[heroPosition.Item1, heroPosition.Item2] = hero;
+            map[2, 2] = monster;
             HouseCreator((10,10),(5,5));
         }
 
@@ -62,7 +62,7 @@ namespace RogueLike
                 {
                     if (x == hx - h1 || x == hx + h11 || y == hy - h2 || y == hy + h22 )
                     {
-                        map[x, y] = wall.symbol;
+                        map[x, y] = wall;
                     }
                 }
             }
@@ -78,7 +78,7 @@ namespace RogueLike
                     doorpos != (hx,hy))
                 {
                     dexist = false;
-                    map[doorpos.Item1, doorpos.Item2] = door.symbol;
+                    map[doorpos.Item1, doorpos.Item2] = door;
                 }
             }
 
@@ -94,7 +94,7 @@ namespace RogueLike
                 {
                     for (int X = 0; X < mapX; X++)
                     {
-                        Console.Write(map[X, Y]);
+                        Console.Write(map[X, Y].symbol);
                     }
                     Console.WriteLine();
                 }
@@ -105,7 +105,7 @@ namespace RogueLike
 
 
         }
-        public string underfeet = ".";
+        
         public (int, int) Move()
         {
             int x = heroPosition.Item1;
@@ -130,16 +130,26 @@ namespace RogueLike
                     X++;
                     break;
             }
-            map[x, y] = underfeet;
-            string stepTo = map[X, Y];
-            underfeet = stepTo;
-            map[X, Y] = hero.symbol;
-            heroPosition = (X, Y);
+            object underfeet = map[x,y];
+            object stepTo = map[X, Y];
+            if (map[X,Y].block == false)
+            {
+               
+            }
+            else
+            {
+                heroPosition = (X, Y);
+                underfeet = stepTo;
+                map[X, Y] = hero;
+            }
+
+
             return (heroPosition);
         }
 
         public class Cage
         {
+            
             public string symbol { get; set; }
             public bool block { get; set; }
             public Cage(string CageSymbol, bool Block)
